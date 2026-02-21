@@ -2,69 +2,58 @@
 <html lang="mg">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Don Bosco</title>
     <style>
-        body { background-color: #0d0d0d; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; overflow: hidden; }
-        .container { padding: 20px; }
+        body { background-color: #0d0d0d; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .radio-img { width: 140px; margin-bottom: 20px; }
-        .power-btn { width: 220px; height: 220px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        #status { margin-top: 20px; font-weight: bold; color: #888; font-size: 1rem; min-height: 50px; }
-        .footer { margin-top: 20px; font-size: 0.8rem; color: #444; font-style: italic; }
-        .exit-btn { margin-top: 20px; background-color: #701111; color: white; border: none; padding: 10px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .power-btn { width: 220px; height: 220px; cursor: pointer; transition: 0.2s; }
+        .power-btn:active { transform: scale(0.9); }
+        #status { margin-top: 20px; font-weight: bold; color: #888; height: 40px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <img src="assets/radio.png" class="radio-img">
-        <div id="playArea">
-            <img id="btnAction" src="assets/play.png" class="power-btn">
-        </div>
-        <div id="status">TSINDRIO NY BOKOTRA HANDRESEANA NY RADIO</div>
-        <button class="exit-btn" onclick="location.reload()">RELOAD APP</button>
-        <div class="footer">Vita nataon'i Herisitraka</div>
-    </div>
-
-    <audio id="radioPlayer" crossorigin="anonymous"></audio>
+    <img src="assets/radio.png" class="radio-img">
+    <img id="btnAction" src="assets/play.png" class="power-btn" onclick="toggleRadio()">
+    <div id="status">TSINDRIO NY BOKOTRA</div>
 
     <script>
-        const audio = document.getElementById('radioPlayer');
-        const btn = document.getElementById('btnAction');
-        const status = document.getElementById('status');
-        
-        // Mampiasa proxy https raha ilaina, fa andramana mivantana aloha
-        const streamUrl = "http://onair15.xdevel.com/proxy/radiodonbosco";
+        // Mampiasa audio element iray raikitra
+        const audio = new Audio();
+        // Ity rohy ity dia misy "/;" any amin'ny farany (zava-dehibe ho an'ny stream)
+        const streamUrl = "http://onair15.xdevel.com/proxy/radiodonbosco/;stream.mp3";
         let isPlaying = false;
 
-        btn.onclick = function() {
+        function toggleRadio() {
+            const btn = document.getElementById('btnAction');
+            const status = document.getElementById('status');
+
             if (!isPlaying) {
-                status.innerText = "MAMPIDITRA FEO... (Andraso kely)";
+                status.innerText = "MAMPIDITRA FEO...";
                 status.style.color = "orange";
                 
-                // Refresh ny stream isaky ny tsindrina
-                audio.src = streamUrl + "/;"; 
+                audio.src = streamUrl;
                 
                 audio.play().then(() => {
-                    // MIREDAKA MENA ny bokotra raha vao mipoaka ny feo
-                    btn.src = 'assets/stop.png';
-                    status.innerText = "🔊 RADIO VELONA (RDB)";
-                    status.style.color = "#00ff33";
                     isPlaying = true;
+                    btn.src = 'assets/stop.png';
+                    status.innerText = "🔊 RADIO VELONA";
+                    status.style.color = "#00ff33";
                 }).catch(err => {
-                    status.innerText = "Sakanan'ny navigateur ny feo. Tsindrio indray na jereo ny Internet.";
+                    console.error(err);
+                    status.innerText = "TSY MANDEHA: Jereo ny fidirana Internet";
                     status.style.color = "red";
-                    console.log("Playback error: ", err);
                 });
             } else {
                 audio.pause();
-                audio.src = ""; // Force stop download
+                audio.src = ""; // Atsahatra ny fandraisana data
+                isPlaying = false;
                 btn.src = 'assets/play.png';
                 status.innerText = "RADIO MATY";
                 status.style.color = "#888";
-                isPlaying = false;
             }
-        };
+        }
     </script>
 </body>
 </html>
