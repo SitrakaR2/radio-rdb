@@ -2,58 +2,121 @@
 <html lang="mg">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Radio Don Bosco</title>
+
+    <link rel="apple-touch-icon" href="assets/radio.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RDB Radio">
+
     <style>
-        body { background-color: #0d0d0d; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .radio-img { width: 140px; margin-bottom: 20px; }
-        .power-btn { width: 220px; height: 220px; cursor: pointer; transition: 0.2s; }
-        .power-btn:active { transform: scale(0.9); }
-        #status { margin-top: 20px; font-weight: bold; color: #888; height: 40px; }
+        body { 
+            background-color: #0d0d0d; 
+            color: white; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container { padding: 20px; }
+
+        .radio-img { 
+            width: 140px; 
+            margin-bottom: 25px; 
+            filter: drop-shadow(0 0 10px rgba(0, 255, 51, 0.2));
+        }
+
+        .power-btn { 
+            width: 220px; 
+            height: 220px; 
+            cursor: pointer; 
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s;
+        }
+
+        .power-btn:active { transform: scale(0.95); }
+
+        #status { 
+            margin-top: 25px; 
+            font-weight: bold; 
+            color: #888; 
+            font-size: 1.1rem; 
+            min-height: 50px; 
+            text-transform: uppercase;
+        }
+
+        .footer { 
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.8rem; 
+            color: #555; 
+            letter-spacing: 1px;
+        }
+
+        /* Mba tsy hikitikitika rehefa zoom-ena amin'ny finday */
+        * { touch-action: manipulation; }
     </style>
 </head>
 <body>
 
-    <img src="assets/radio.png" class="radio-img">
-    <img id="btnAction" src="assets/play.png" class="power-btn" onclick="toggleRadio()">
-    <div id="status">TSINDRIO NY BOKOTRA</div>
+    <div class="container">
+        <img src="assets/radio.png" class="radio-img" alt="Radio Icon">
+
+        <div id="playArea">
+            <img id="btnAction" src="assets/play.png" class="power-btn">
+        </div>
+
+        <div id="status">TSINDRIO NY BOKOTRA</div>
+
+        <div class="footer">Nataon'i RAKOTOANADAHY</div>
+    </div>
+
+    <audio id="radioPlayer" crossorigin="anonymous"></audio>
 
     <script>
-        // Mampiasa audio element iray raikitra
-        const audio = new Audio();
-        // Ity rohy ity dia misy "/;" any amin'ny farany (zava-dehibe ho an'ny stream)
-        const streamUrl = "http://onair15.xdevel.com/proxy/radiodonbosco/;stream.mp3";
+        const audio = document.getElementById('radioPlayer');
+        const btn = document.getElementById('btnAction');
+        const status = document.getElementById('status');
+        
+        // Rohy HTTPS azo antoka ho an'ny iPhone
+        const streamUrl = "https://onair15.xdevel.com/proxy/radiodonbosco/;stream.mp3";
         let isPlaying = false;
 
-        function toggleRadio() {
-            const btn = document.getElementById('btnAction');
-            const status = document.getElementById('status');
-
+        btn.onclick = function() {
             if (!isPlaying) {
                 status.innerText = "MAMPIDITRA FEO...";
                 status.style.color = "orange";
                 
                 audio.src = streamUrl;
-                
+                audio.load();
+
+                // iPhone gesture play
                 audio.play().then(() => {
-                    isPlaying = true;
                     btn.src = 'assets/stop.png';
                     status.innerText = "🔊 RADIO VELONA";
                     status.style.color = "#00ff33";
+                    isPlaying = true;
                 }).catch(err => {
                     console.error(err);
-                    status.innerText = "TSY MANDEHA: Jereo ny fidirana Internet";
+                    status.innerText = "TSY MANDEHA: Jereo ny internet";
                     status.style.color = "red";
                 });
             } else {
                 audio.pause();
-                audio.src = ""; // Atsahatra ny fandraisana data
-                isPlaying = false;
+                audio.src = ""; 
                 btn.src = 'assets/play.png';
                 status.innerText = "RADIO MATY";
                 status.style.color = "#888";
+                isPlaying = false;
             }
-        }
+        };
     </script>
 </body>
 </html>
